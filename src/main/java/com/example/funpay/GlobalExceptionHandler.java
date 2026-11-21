@@ -9,6 +9,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.time.Instant;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.stream.Collectors;
+
+import com.example.funpay.Exceptions.UserNotAuthenticatedException;
 import com.example.funpay.Exceptions.UserNotFoundException;
 
 @RestControllerAdvice 
@@ -39,5 +41,10 @@ public class GlobalExceptionHandler {
     String message = "user not found";
     ApiError error = new ApiError(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(), message, Instant.now());
     return new ResponseEntity<>(error, HttpStatus.NOT_FOUND );
+  }
+  @ExceptionHandler(UserNotAuthenticatedException.class)
+  public ResponseEntity<ApiError> handleUnauthenticatedUser(UserNotAuthenticatedException e){
+    ApiError error = new ApiError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(), e.getMessage(), Instant.now());
+    return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED );
   }
 }

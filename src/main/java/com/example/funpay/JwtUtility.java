@@ -18,13 +18,16 @@ import javax.crypto.SecretKey;
 
 @Service
 public class JwtUtility {
-
+// ensure security key is base64 encoded beforehand 
   @Value("${security.jwt.secret-key}")
   private String secretKey;
 
   @Value("${security.jwt.expiration-time}") // in secs
   private long expirationTimeMillis;
 
+  public String encode(String subject){
+    return encode(subject, java.util.Collections.emptyMap());
+  }
 
   // encode
 

@@ -1,12 +1,19 @@
 package com.example.funpay.dto;
 
-import com.example.funpay.UserEntity;
 
 public class UserLoginResponseDTO {
  private String token;
 
- public UserLoginResponseDTO(UserEntity userEntity){
-  
+ public UserLoginResponseDTO(String token){
+  this.token = token;
  }
+
+ public void setToken(String token){
+  this.token = token;
+ }
+
+ public String getToken(){
+  return this.token;
+ } 
 
 }

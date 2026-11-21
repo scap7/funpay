@@ -2,6 +2,7 @@ package com.example.funpay;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.funpay.dto.UserCreateRequestDTO;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -44,12 +45,11 @@ public class HomeController {
   }
   // create user
   @PostMapping
-  public  ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserResponseDTO params){
-    return ResponseEntity.ok(userService.createUser(params));
+  public  ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateRequestDTO params){
+    return new ResponseEntity<>(userService.createUser(params), HttpStatus.CREATED);
   }
 
   // get specific user
-
   @GetMapping("/{id}")
   public ResponseEntity<UserResponseDTO> getUser(@PathVariable Long id) {
   // because it autowires userservice and not userRepository
@@ -74,8 +74,9 @@ public class HomeController {
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponseDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO){
 
-   UserLoginResponseDTO UserLoginResponseDTO = userService.loginUser(userLoginDTO);
-   return new ResponseEntity<>(UserLoginResponseDTO, HttpStatus.ACCEPTED);
+   UserLoginResponseDTO userLoginResponseDTO = userService.loginUser(userLoginDTO);
+   System.out.println(userLoginResponseDTO);
+   return new ResponseEntity<>(userLoginResponseDTO, HttpStatus.ACCEPTED);
     
   }
   

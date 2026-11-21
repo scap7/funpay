@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.funpay.Exceptions.UserNotFoundException;
+import com.example.funpay.Exceptions.UserNotAuthenticatedException;
+import com.example.funpay.dto.UserCreateRequestDTO;
 import com.example.funpay.dto.UserLoginDTO;
 import com.example.funpay.dto.UserLoginResponseDTO;
 import com.example.funpay.dto.UserResponseDTO;
@@ -14,10 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class UserService {
   private UserRepository userRepository;
   private BCryptPasswordEncoder passwordEncoder;
+  private JwtUtility jwtUtility;
 
-  public UserService(UserRepository userRepository){
+  public UserService(UserRepository userRepository, JwtUtility jwtUtility){
     this.userRepository = userRepository;
     this.passwordEncoder  = new BCryptPasswordEncoder();
+    this.jwtUtility = jwtUtility;
   }
 
   public List<UserResponseDTO> getAllUsers(){
@@ -33,11 +37,21 @@ public class UserService {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public UserResponseDTO createUser(UserResponseDTO userResponseDTO){
-    UserEntity userEntity = new UserEntity(userResponseDTO.getUserName(), userResponseDTO.getUserGender(), userResponseDTO.getUserAge());
+  public UserResponseDTO createUser(UserCreateRequestDTO userCreateRequestDTO){
+    UserEntity userEntity = new UserEntity(userCreateRequestDTO.getUserName(), userCreateRequestDTO.getUserGender(), userCreateRequestDTO.getUserAge());
+    userEntity.setEmail(userCreateRequestDTO.getEmail());
+    if(userCreateRequestDTO.getPassword().equals(userCreateRequestDTO.getPasswordConfirmation())){
+      String encodedPassword = passwordEncoder.encode(userCreateRequestDTO.getPassword());
+      userEntity.setPassword(encodedPassword);  
+    }else{
+      throw new UserNotAuthenticatedException("password and password confirmation does not match");
+    }
+    userEntity.setEmail(userCreateRequestDTO.getEmail());
+
     UserEntity ue = userRepository.save(userEntity);
     return new UserResponseDTO(ue);
   }
+
   @Transactional(rollbackFor = Exception.class)
   public UserResponseDTO updateUser(Long id, UserResponseDTO userResponseDTO){
     Optional<UserEntity> userEntityOpt = userRepository.findById(id);
@@ -64,9 +78,13 @@ public class UserService {
   public UserLoginResponseDTO loginUser(UserLoginDTO userLoginDTO){
     UserEntity userEntity = findByEmail(userLoginDTO.getEmail());
     //authenticate
-    passwordEncoder.matches(userLoginDTO.getPassword(), userEntity.getPassword());
-    return new UserLoginResponseDTO(userEntity);
-
+    boolean passwordMatch = passwordEncoder.matches(userLoginDTO.getPassword(), userEntity.getPassword());
+    if(passwordMatch){
+      String token = jwtUtility.encode(userLoginDTO.getEmail());
+      return new UserLoginResponseDTO(token);
+    }else{
+      throw new UserNotAuthenticatedException("email or password is incorrect");
+    }
   }
 
   private UserEntity findByEmail(String email){

@@ -1,6 +1,8 @@
 package com.example.funpay;
 
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +23,9 @@ public class UserEntity{
   private String gender;
   @Column(nullable = false)
   private int age;
+  @Column(nullable=false)
   private String email;
+  @Column(nullable=false)
   private String password;
 
   public UserEntity(){
@@ -48,7 +52,9 @@ public class UserEntity{
   public void setGender(String gender) { this.gender = gender; }
   public void setAge(int age) { this.age = age; }
   public void setEmail(String email){this.email = email;}
-  public void setPassword(String pass){this.password = pass;}
+  public void setPassword(String pass){
+    this.password = pass;
+  }
 
   public String toString(){
     return "User:[" + "|name:" + this.name + "| age: " + this.age + "| gender: " + this.gender + "]";

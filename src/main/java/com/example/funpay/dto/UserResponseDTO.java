@@ -13,12 +13,19 @@ public class UserResponseDTO {
   private String userGender;
   @NotBlank(message = "Name is required and cannot be blank")
   private String userName;
+  @NotBlank(message = "password cannot be blank")
+  private String password;
+  @NotBlank(message = "password confirmation cannot be blank")
+  private String passwordConfirmation;
+  @NotBlank
+  private String email;
 
   public UserResponseDTO(UserEntity userEntity){
     this.userId = userEntity.getId();
     this.userAge = userEntity.getAge();
     this.userGender = userEntity.getGender();
     this.userName = userEntity.getName();
+    this.email = userEntity.getEmail();
   }
 
   public UserResponseDTO(){
@@ -41,6 +48,10 @@ public class UserResponseDTO {
     return this.userName;
   }
 
+  public String getEmail(){
+    return this.email;
+  }
+
   // setters
   public void setUserId(Long id){
     this.userId = id;
@@ -54,10 +65,14 @@ public class UserResponseDTO {
     this.userGender = gender;
   }
 
-  public String setUserName(String userName){
-    return this.userName = userName;
+  public void setUserName(String userName){
+    this.userName = userName;
   }
 
+  public void setEmail(String email){
+    this.email = email;
+  }
+  
   public String toString(){
     return "UserResponseDTO: [" + "userId: " + userId + " userAge: " + userAge + " userName: " + userName;
   }
